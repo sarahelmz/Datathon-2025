@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>FinTrack — Accueil Trading</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <nav class="nav">
+      <a class="brand" href="#">
+        <div class="logo">IT</div>
+        <div class="name">InnovaTrack</div>
+      </a>
+        <form action="/submit-form" class="search-bar">
+          <input type="text" placeholder="Rechercher des companies..." id="searchInput" autocomplete="off" />
+          <div id="searchSuggestions" class="search-suggestions"></div>
+        </form>
+    </nav>
+  </header>
+
+  <main class="chat-layout" id="chatLayout">
+    <!-- Hero -->
+    <section class="hero">
+      <div>
+        <h1 class="heroTitle">InnovaTrack</h1>
+        <p class="heroP">Parce que chaque loi change le jeu, <strong>InnovaTrack</strong> vous aide à garder une longueur d'avance.</p>
+      </div>
+    </section>
+
+    <!-- Insights Grid -->
+    <section class="grid">
+      <div class="card">
+        <div class="cardHeader">
+          <div class="cardTitle">Top 5 par poids dans l'Indice</div>
+          <div class="chip" id="dateChip"></div>
+        </div>
+        <div class="cardBody">
+          <div class="list" id="top5"></div>
+        </div>
+      </div>
+      <div class="card chat-card">
+        <div class="chat-window" id="chatWindow">
+          <div class="chat-header">
+            <h2 class="logo-text">FinTrack Assistant Bot</h2>
+          </div>
+        <div class="chat-body" id="chatLog">
+          <div class="msg bot">Salut, je suis ton assistant FinTrack!</div>
+        </div>
+        <div class="chat-input">
+          <input type="file" id="chatFile" class="chat-file-input" accept=".txt,.md,.json,.csv,.tsv,.log,.yaml,.yml,.xml,.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.html,.htm,.rtf,.ini,.cfg,.env,.py,.js,.ts,.java,.cs,.cpp,.c,.h,.hpp,.swift,.go,.rb,.php,.rs,.sql,.tex,.ipynb">
+          <button type="button" class="chat-attach" id="chatAttach">📎</button>
+          <input type="text" placeholder="Écris ton message…" id="chatInput" autocomplete="off">
+          <button id="chatSend">Envoyer</button>
+        </div>
+        <div class="chat-attachment-view is-hidden" id="chatAttachmentView">
+          <div class="attachment-name" id="attachmentName">Aucune pièce jointe</div>
+          <button type="button" class="attachment-clear" id="attachmentClear">Retirer</button>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- Company View -->
+  <section class="company-view is-hidden" id="companyView">
+    <div class="company-view-header">
+      <button class="back-button" id="backToChat">← Retour au chat</button>
+    </div>
+    <div class="card company-card">
+      <div class="cardHeader">
+        <div>
+          <div class="cardTitle" id="companyName">Sélectionnez une compagnie</div>
+          <div class="company-subtitle" id="companySymbol">—</div>
+        </div>
+        <div class="chip" id="companyExchange">—</div>
+      </div>
+      <div class="cardBody company-body">
+        <div class="company-meta">
+          <div class="meta-box">
+            <div class="meta-label">Prix actuel</div>
+            <div class="meta-value" id="companyPrice">—</div>
+            <div class="meta-change" id="companyChange">—</div>
+          </div>
+          <div class="meta-box">
+            <div class="meta-label">Capitalisation</div>
+            <div class="meta-value" id="companyMarketCap">—</div>
+          </div>
+        </div>
+        <div class="company-status neutral" id="companyStatus">Recherche une compagnie via la barre supérieure pour afficher les données.</div>
+        <div class="charts">
+          <div class="chart-block">
+            <div class="chart-title">Évolution sur 1 mois</div>
+            <canvas id="priceChart" height="220"></canvas>
+          </div>
+          <div class="chart-block">
+            <div class="chart-title">Variations quotidiennes</div>
+            <canvas id="performanceChart" height="220"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    © <span id="year">2025</span> FinTrack | Built for speed & clarity.
+  </footer>
+
+  <script src="index.js"></script>
+  <script src="search.js"></script>
+  <script>
+    document.getElementById("dateChip").textContent = new Date().toLocaleDateString("fr-FR");
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+  </script>
+</body>
+</html>

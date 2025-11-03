@@ -1,0 +1,19 @@
+{
+  "name": "datathon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "convert_sp500.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "csvtojson": "^2.0.14",
+    "dotenv": "^17.2.3",
+    "express": "^4.21.2"
+  }
+}
