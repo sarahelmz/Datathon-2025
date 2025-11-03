@@ -20,6 +20,12 @@ try {
   process.exit(1);
 }
 
+if (!ALPHA_VANTAGE_KEY) {
+  console.warn(
+    'ALPHA_VANTAGE_KEY is not set. Financial data routes will fail until the key is provided.'
+  );
+}
+
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -72,6 +78,12 @@ app.get('/search', (req, res) => {
 });
 
 const alphaRequest = async (params) => {
+  if (!ALPHA_VANTAGE_KEY) {
+    const error = new Error('Alpha Vantage API key manquante.');
+    error.status = 500;
+    throw error;
+  }
+
   const url = new URL(ALPHA_BASE_URL);
   const searchParams = new URLSearchParams({ ...params, apikey: ALPHA_VANTAGE_KEY });
   url.search = searchParams.toString();
@@ -113,15 +125,17 @@ const parseDailySeries = (payload) => {
   const dates = Object.keys(series).sort();
   if (!dates.length) return null;
 
-  const history = dates.map((date) => {
-    const entry = series[date] || {};
-    const close = Number.parseFloat(entry['4. close']);
-    if (!Number.isFinite(close)) return null;
-    return {
-      date: new Date(date).toISOString(),
-      close,
-    };
-  }).filter(Boolean);
+  const history = dates
+    .map((date) => {
+      const entry = series[date] || {};
+      const close = Number.parseFloat(entry['4. close']);
+      if (!Number.isFinite(close)) return null;
+      return {
+        date: new Date(date).toISOString(),
+        close,
+      };
+    })
+    .filter(Boolean);
 
   if (!history.length) return null;
 
@@ -133,21 +147,6 @@ const parseDailySeries = (payload) => {
     latest,
     previous,
   };
-};
-
-const sanitizeSymbols = (value) => {
-  if (!value) return [];
-  const list = Array.isArray(value) ? value : String(value).split(',');
-  const clean = [];
-  const seen = new Set();
-  for (const entry of list) {
-    if (typeof entry !== 'string') continue;
-    const symbol = entry.trim().toUpperCase();
-    if (!symbol || seen.has(symbol)) continue;
-    clean.push(symbol);
-    seen.add(symbol);
-  }
-  return clean;
 };
 
 const cache = new Map();
@@ -167,7 +166,6 @@ const getCache = (key) => {
 const OVERVIEW_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const RATE_LIMIT_MESSAGE =
   'La limite de requêtes Alpha Vantage a été atteinte. Réessayez dans quelques instants.';
-
 const SERIES_TTL_MS = 2 * 60 * 1000; // 2 minutes
 
 const parseIntradaySeries = (payload) => {
@@ -257,9 +255,7 @@ const fetchTimeSeries = async (symbol) => {
     );
     if (intraday) return intraday;
 
-    const error = new Error(
-      `Aucune série quotidienne disponible pour ${symbol}.`
-    );
+    const error = new Error(`Aucune série de prix exploitable trouvée pour ${symbol}.`);
     error.status = 404;
     throw error;
   } catch (error) {
@@ -272,9 +268,6 @@ const fetchDailySeries = async (symbol) => {
   try {
     return await fetchTimeSeries(symbol);
   } catch (error) {
-    if (error.status === 404) {
-      throw new Error(`Aucune série de prix exploitable trouvée pour ${symbol}.`);
-    }
     throw error;
   }
 };
@@ -300,6 +293,22 @@ const fetchOverview = async (symbol) => {
     throw error;
   }
 };
+
+const sanitizeSymbols = (value) => {
+  if (!value) return [];
+  const list = Array.isArray(value) ? value : String(value).split(',');
+  const clean = [];
+  const seen = new Set();
+  for (const entry of list) {
+    if (typeof entry !== 'string') continue;
+    const symbol = entry.trim().toUpperCase();
+    if (!symbol || seen.has(symbol)) continue;
+    clean.push(symbol);
+    seen.add(symbol);
+  }
+  return clean;
+};
+
 app.get('/api/company', async (req, res) => {
   const rawSymbol = typeof req.query.symbol === 'string' ? req.query.symbol : '';
   const symbol = rawSymbol.trim().toUpperCase();
